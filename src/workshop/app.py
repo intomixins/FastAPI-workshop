@@ -4,12 +4,10 @@ from settings import settings
 
 import uvicorn
 
+from workshop.api import router
+
 app = FastAPI()
-
-
-@app.get('/')
-def root():
-    return {'message': 'hello!'}
+app.include_router(router)
 
 
 if __name__ == '__main__':
