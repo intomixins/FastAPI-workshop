@@ -1,8 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import status
+from fastapi.security import OAuth2PasswordBearer
 
 from jose import (
     JWTError,
@@ -23,6 +24,12 @@ from ..models.auth import (
     UserCreate,
 )
 from ..settings import settings
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='/auth/sign-in')
+
+
+def get_current_user(token: str = Depends(oauth2_scheme)) -> User:
+    return AuthService.validate_token(token)
 
 
 class AuthService:
@@ -56,7 +63,7 @@ class AuthService:
         user_data = payload.get('user')
 
         try:
-            user = User.parse_obj(user_data)
+            user = User.model_validate(user_data)
         except ValidationError:
             raise exception from None
 
@@ -64,20 +71,20 @@ class AuthService:
 
     @classmethod
     def create_token(cls, user: tables.User) -> Token:
-        user_data = User.from_orm(user)
+        user_data = User.model_validate(user)
 
-        now = datetime.now()
+        now = datetime.utcnow()
         payload = {
             'iat': now,
             'nbf': now,
-            'exp': now + settings.jwt_expiration,
+            'exp': now + timedelta(seconds=settings.jwt_expiration),
             'sub': str(user_data.id),
-            'user': user_data.dict(),
+            'user': user_data.model_dump(),
         }
         token = jwt.encode(
             payload,
             settings.jwt_secret,
-            algorithm=[settings.jwt_algorithm],
+            algorithm=settings.jwt_algorithm,
         )
 
         return Token(access_token=token)
@@ -94,5 +101,29 @@ class AuthService:
 
         self.session.add(user)
         self.session.commit()
+
+        return self.create_token(user)
+
+    def authenticate_user(self, username: str, password: str) -> Token:
+        exception = HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail='Incorrect username or password',
+            headers={
+                'WWW-Authenticate': 'Bearer',
+            },
+        )
+
+        user = (
+            self.session
+            .query(tables.User)
+            .filter(tables.User.username == username)
+            .first()
+        )
+
+        if not user:
+            raise exception
+
+        if not self.verify_password(password, user.password_hash):
+            raise exception
 
         return self.create_token(user)
