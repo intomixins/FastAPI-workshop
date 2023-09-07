@@ -20,6 +20,7 @@ def sign_up(
     user_data: UserCreate,
     service: AuthService = Depends(),
 ):
+    """эндпоинт регистрации."""
     return service.register_new_user(user_data)
 
 
@@ -28,6 +29,7 @@ def sign_in(
     form_data: OAuth2PasswordRequestForm = Depends(),
     service: AuthService = Depends(),
 ):
+    """эндпоинт аутентификации."""
     return service.authenticate_user(
         form_data.username,
         form_data.password,
@@ -36,4 +38,5 @@ def sign_in(
 
 @router.get('/user', response_model=User)
 def get_user(user: User = Depends(get_current_user)):
+    """эндпоинт получение данных о пользователе."""
     return user

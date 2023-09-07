@@ -16,6 +16,7 @@ Session = sessionmaker(
 
 
 def get_session() -> Session:
+    """создание и последующее закрытие сессии."""
     session = Session()
     try:
         yield session

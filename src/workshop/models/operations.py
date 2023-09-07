@@ -7,11 +7,13 @@ from pydantic import BaseModel
 
 
 class OperationKind(str, Enum):
+    """модель вида операции."""
     INCOME = 'income'
     OUTCOME = 'outcome'
 
 
 class OperationBase(BaseModel):
+    """базовая модель операции"""
     date: date
     kind: OperationKind
     amount: Decimal
@@ -19,6 +21,8 @@ class OperationBase(BaseModel):
 
 
 class Operation(OperationBase):
+    """была создана отдельная модель с целью соблюдения
+    принципов SOLID."""
     id: int
 
     class Config:
@@ -26,8 +30,10 @@ class Operation(OperationBase):
 
 
 class OperationCreate(OperationBase):
+    """модель для создания опирации."""
     pass
 
 
 class OperationUpdate(OperationBase):
+    """модель для изменения операции"""
     pass

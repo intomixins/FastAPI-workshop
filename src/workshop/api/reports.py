@@ -24,6 +24,7 @@ def import_csv(
     user: User = Depends(get_current_user),
     reports_service: ReportsService = Depends(),
 ):
+    """эндпоинт для добавления операций из csv файла."""
     background_tasks.add_task(
         reports_service.import_csv,
         user.id,
@@ -36,6 +37,7 @@ def export_csv(
     user: User = Depends(get_current_user),
     reports_service: ReportsService = Depends(),
 ):
+    """эндпоинт для получения операций из csv файла."""
     report = reports_service.export_csv(user.id)
     return StreamingResponse(
         report,

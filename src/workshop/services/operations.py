@@ -22,6 +22,7 @@ class OperationsService:
         self.session = session
 
     def _get(self, user_id: int, operation_id) -> Type[Operation]:
+        """получение операции по id."""
         operation = (
             self.session
             .query(Operation)
@@ -35,7 +36,12 @@ class OperationsService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         return operation
 
-    def get_list(self, user_id: int, kind: OperationKind = None) -> list[Type[Operation]]:
+    def get_list(
+            self,
+            user_id: int,
+            kind: OperationKind = None,
+    ) -> list[Type[Operation]]:
+        """получение списка всех операций."""
         query = (
             self.session
             .query(Operation)
@@ -47,9 +53,15 @@ class OperationsService:
         return operations
 
     def get(self, user_id: int, operation_id: int) -> Type[Operation]:
+        """получение одной операции."""
         return self._get(user_id, operation_id)
 
-    def create_many(self, user_id: int, operations_data: list[OperationCreate]) -> list[Operation]:
+    def create_many(
+            self,
+            user_id: int,
+            operations_data: list[OperationCreate],
+    ) -> list[Operation]:
+        """создание нескольких операций сразу."""
         operations = [
             Operation(
                 **operation_data.model_dump(),
@@ -61,7 +73,9 @@ class OperationsService:
         self.session.commit()
         return operations
 
-    def create(self, user_id: int, operation_data: OperationCreate) -> Operation:
+    def create(self, user_id: int,
+               operation_data: OperationCreate) -> Operation:
+        """создание операции."""
         operation = Operation(
             **operation_data.model_dump(),
             user_id=user_id,
@@ -70,11 +84,13 @@ class OperationsService:
         self.session.commit()
         return operation
 
-    def update(self,
-               user_id: int,
-               operation_id: int,
-               operation_data: OperationUpdate,
-               ) -> Type[Operation]:
+    def update(
+        self,
+        user_id: int,
+        operation_id: int,
+        operation_data: OperationUpdate,
+    ) -> Type[Operation]:
+        """изменение операции."""
         operation = self._get(user_id, operation_id)
         for field, value in operation_data:
             setattr(operation, field, value)
@@ -82,6 +98,7 @@ class OperationsService:
         return operation
 
     def delete(self, user_id: int, operation_id: int) -> None:
+        """удаление операции."""
         operation = self._get(user_id, operation_id)
         self.session.delete(operation)
         self.session.commit()

@@ -27,6 +27,7 @@ def get_operations(
     user: User = Depends(get_current_user),
     service: OperationsService = Depends(),
 ):
+    """эндпоинт получения списка всех операций."""
     return service.get_list(user_id=user.id, kind=kind)
 
 
@@ -36,6 +37,7 @@ def create_operation(
     user: User = Depends(get_current_user),
     service: OperationsService = Depends(),
 ):
+    """эндпоинт добавления операции."""
     return service.create(user_id=user.id, operation_data=operation_data)
 
 
@@ -45,6 +47,7 @@ def get_operation(
     user: User = Depends(get_current_user),
     service: OperationsService = Depends(),
 ):
+    """эндпоинт получение конкретной операции по id."""
     return service.get(user_id=user.id, operation_id=operation_id)
 
 
@@ -55,6 +58,7 @@ def update_operation(
     user: User = Depends(get_current_user),
     service: OperationsService = Depends(),
 ):
+    """эндпоинт изменения операции."""
     return service.update(
         user_id=user.id,
         operation_id=operation_id,
@@ -68,5 +72,6 @@ def delete_operation(
     user: User = Depends(get_current_user),
     service: OperationsService = Depends(),
 ):
+    """эндпоинт удаления операции."""
     service.delete(user_id=user.id, operation_id=operation_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

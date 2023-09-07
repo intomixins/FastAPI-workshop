@@ -16,6 +16,7 @@ class ReportsService:
         self.operations_service = operations_service
 
     def import_csv(self, user_id: int, file: Any) -> None:
+        """импорт csv файла."""
         reader = csv.DictReader(
             (line.decode() for line in file),
             fieldnames=[
@@ -40,6 +41,7 @@ class ReportsService:
         )
 
     def export_csv(self, user_id: int) -> Any:
+        """получение csv файла."""
         output = StringIO()
         writer = csv.DictWriter(
             output,
